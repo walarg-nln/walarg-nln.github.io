@@ -8,22 +8,25 @@
 		.box {
 			width: 70px;
 			height: 70px;
-			background-color: teal;
 			font-size: 300%;
 			text-align: center;
 			user-select: none;
-			display: block;
+			background-color:white;
 			position: absolute;
 			top: 100px;
 			left: 0px;  /* <--- Change me! */
+			/* DVD image
+			 url("https://upload.wikimedia.org/wikipedia/commons/9/9b/DVD_logo.svg") */
 		}
 		.board{
 			height: 100vh;
+			width: 190;
 		}
 		body {
  		background-image: url("https://images3.alphacoders.com/132/1322308.jpeg");
  		background-color: #cccccc;
 		}
+		
 	</style>
 	<!-- 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
 
@@ -33,6 +36,7 @@
 	<div class="box">?</div>
 
 	<script>
+		var consecutiveMissClicks = 0;
 		(function(){
 			'use strict'
 			/* global jQuery */
@@ -47,10 +51,33 @@
 			var boardHeight = jQuery(window).height(); // Max Y cord height lol
 
 			// Every 50 milliseconds, call the update Function (see below)
-			setInterval(update, 50);
+			var interval = setInterval(update, 50);
 			
+			//Game ending function
+			function endGame() {
+				clearInterval(interval)
+			}
+
+			// DVD color changing code
+			
+			// Color changing function
+			var colorStr = "rgb(50, 25, 250)";
+			box.css('background-color', colorStr);
+			// box.css('background-color', colorStr);
+
+			function getRandomColor() {
+				function randColor() {
+					return Math.random() * 255;
+				}
+				return 'rgb(' + randColor() + ", " + randColor() + ", " + randColor() + ")";
+			}
+
 			// Every time the box is clicked, call the handleBoxClick Function (see below)
 			box.on('click', handleBoxClick);
+			// *************************
+			//ask coach JJ:"This missClick function only worked when I didn't call it with parenthesis. It does not need an argument. Why is that?"
+			//**************************
+			board.on('click', missClick);
 
 			// moves the Box to a new position on the screen along the X-Axis
 			function moveBoxTo(newPositionX, newPositionY) {
@@ -100,8 +127,10 @@
 				if (positionY < 0){
 					speedY = speedY * -1;
 				}	
+				if (consecutiveMissClicks >= 10) {
+					endGame();
+				}
 				
-
 			};
 
 			/* 
@@ -109,28 +138,51 @@
 			it should increase the points total, increase the speed, and move the box to
 			the left side of the screen.
 			*/
+
+			
+			function missClick() {
+				if(consecutiveMissClicks >= 10) {
+					endGame();
+
+				} else {consecutiveMissClicks += 1;}
+			}
+			
+
 			function handleBoxClick() {
 				
 				if (speed > 0){
-					speed += 3;
-					positionX = randNum * 10;
 					points = points + 1;
 					changeBoxText(points);
+					if (points % 3 === 0) {
+						speed += 5;
+						colorStr = getRandomColor;
+						box.css('background-color', colorStr);
+					}
+					positionX = randNum * 10;
 				} else if (speed < 0) {
-					speed -= 3;
-					positionX = randNum * 10;
 					points = points + 1;
 					changeBoxText(points);
+					if (points % 3 === 0) {
+						speed -= 5;
+						colorStr = getRandomColor;
+						box.css('background-color', colorStr);
+					}
+					positionX = randNum * 10;
 				}
 				if (speedY > 0){
-					speedY += 3;
+					if (points % 3 === 0) {
+						speedY += 5;
+					}
 					positionY = randNum * 5;
 				} else if (speedY < 0) {
-					speedY -= 3;
+					if (points % 3 === 0) {
+						speedY -= 5;
+					}
 					positionY = randNum * 5;
 				}
-				randNum = Math.random() * 100
-			}
+				randNum = Math.random() * 100;
+				consecutiveMissClicks = 0;
+			} 
 		})();
 	</script>
 </body>
